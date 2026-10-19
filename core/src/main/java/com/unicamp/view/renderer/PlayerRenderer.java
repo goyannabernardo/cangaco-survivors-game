@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.unicamp.model.entity.Player;
 import com.unicamp.view.EntityRenderer;
+import com.unicamp.model.entity.EntityManager;
 
 public class PlayerRenderer implements EntityRenderer<Player> {
 
@@ -31,7 +32,7 @@ public class PlayerRenderer implements EntityRenderer<Player> {
 
     @Override
     public void render(SpriteBatch batch, Player entity) {
-        stateTime += Gdx.graphics.getDeltaTime();
+        float stateTime = EntityManager.getGlobalTime();
         
         TextureRegion regionToDraw;
 

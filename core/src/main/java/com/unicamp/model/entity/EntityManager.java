@@ -1,7 +1,6 @@
 package com.unicamp.model.entity;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -94,20 +93,7 @@ public class EntityManager {
         }
     }
 
-    private double calcDistanceSq(PositionVO from, PositionVO to) {
-        double distX = (double) from.x() - to.x();
-        double distY = (double) from.y() - to.y();
-        return (distX * distX) + (distY * distY);
-    }
-
-    public PositionVO findNearest(PositionVO from, Class<? extends Entity> entityClass) {
-        return entities.stream()
-            .filter(e -> e.getClass().equals(entityClass))
-            .sorted(Comparator.comparingDouble(e -> calcDistanceSq(from, new PositionVO(e))))
-            .findFirst()
-            .map(PositionVO::new)
-            .orElse(null);
-    }
+    // apaguei o findnearest pq ele não era usado em lugar nenhum
 
     public PositionVO findNearestAssignable(PositionVO origin, Class<? extends Entity> targetBaseClass) {
         Entity nearest = null;
@@ -148,8 +134,12 @@ public class EntityManager {
         }
     }
 
-    public boolean getIsPaused(){
+    public boolean getIsPaused() {
         return isPaused;
+    }
+
+    public void togglePause() {
+        isPaused = !isPaused;
     }
 
     public static float getGlobalTime() {

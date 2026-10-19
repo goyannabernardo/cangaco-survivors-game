@@ -6,40 +6,39 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.unicamp.model.entity.EntityManager;
-import com.unicamp.model.entity.Player;
 import com.unicamp.model.entity.enemy.CorpoSeco;
 import com.unicamp.model.entity.enemy.Diabo;
 import com.unicamp.model.entity.enemy.Enemy;
 import com.unicamp.model.entity.enemy.Lobisomem;
-import com.unicamp.model.valueobject.PositionVO;
 
 public class EnemySpawner {
 
-    private OrthographicCamera camera;
-    private List<Enemy> enemies;
+    // Distância além da borda da tela onde os inimigos nascem (maior que o sprite de 40px)
+    private static final float OFFSCREEN_MARGIN = 64f;
+    private static final float SPAWN_INTERVAL = 1.5f;
+
+    private final OrthographicCamera camera;
+    private final EntityManager entityManager;
+    private final List<Enemy> enemies = new ArrayList<>();
+    private final Random random = new Random();
     private float spawnTimer = 0f;
-    private final float SPAWN_INTERVAL = 1.5f;
-    private final Random random;
 
-    private EntityManager entityManager;
-    private float spriteSize;
-
-    public EnemySpawner(EntityManager entityManager, float spriteSize, OrthographicCamera camera) {
+    public EnemySpawner(EntityManager entityManager, OrthographicCamera camera) {
         this.entityManager = entityManager;
         this.camera = camera;
-        this.spriteSize = spriteSize;
-        this.enemies = new ArrayList<>();
-        this.random = new Random();
     }
-    
+
     public void update(float delta) {
         if (entityManager.getIsPaused()) return;
-        
+
         spawnTimer += delta;
         if (spawnTimer >= SPAWN_INTERVAL) {
             spawnEnemy();
             spawnTimer = 0f;
         }
+
+        // Remove inimigos mortos para a lista não crescer para sempre
+        enemies.removeIf(enemy -> !enemy.isActive());
 
         for (Enemy enemy : enemies) {
             wrapAroundCamera(enemy);
@@ -47,17 +46,31 @@ public class EnemySpawner {
     }
 
     private void spawnEnemy() {
-        PositionVO target = entityManager.findFirst(Player.class);
-        if (target == null) return;
+        // Sorteia um ponto no perímetro de um retângulo logo fora da tela
+        float halfW = camera.viewportWidth / 2f + OFFSCREEN_MARGIN;
+        float halfH = camera.viewportHeight / 2f + OFFSCREEN_MARGIN;
+        float width = halfW * 2f;
+        float height = halfH * 2f;
 
-        float angle = (float) (random.nextDouble() * Math.PI * 2);
-        float spawnRadius = (camera.viewportWidth / 2f) + spriteSize * 2;
+        float t = random.nextFloat() * 2f * (width + height);
+        float offsetX, offsetY;
 
-        float spawnX = target.x() + (float) Math.cos(angle) * spawnRadius;
-        float spawnY = target.y() + (float) Math.sin(angle) * spawnRadius;
+        if (t < width) {                    // lado de cima
+            offsetX = -halfW + t;
+            offsetY = halfH;
+        } else if (t < 2f * width) {        // lado de baixo
+            offsetX = -halfW + (t - width);
+            offsetY = -halfH;
+        } else if (t < 2f * width + height) { // lado esquerdo
+            offsetX = -halfW;
+            offsetY = -halfH + (t - 2f * width);
+        } else {                            // lado direito
+            offsetX = halfW;
+            offsetY = -halfH + (t - 2f * width - height);
+        }
 
-        Enemy newEnemy = createRandomEnemy(spawnX, spawnY);
-        
+        Enemy newEnemy = createRandomEnemy(camera.position.x + offsetX, camera.position.y + offsetY);
+
         enemies.add(newEnemy);
         entityManager.spawnEntity(newEnemy);
     }
@@ -65,30 +78,24 @@ public class EnemySpawner {
     private Enemy createRandomEnemy(float x, float y) {
         int chance = random.nextInt(100);
 
-        if (chance < 10) { 
+        if (chance < 10) {
             // 10% de chance: Lobisomem (tanque)
             return new Lobisomem(x, y, entityManager);
-        } else if (chance < 30) { 
+        } else if (chance < 30) {
             // 20% de chance: Diabo (rápido)
             return new Diabo(x, y, entityManager);
-        } else { 
+        } else {
             // 70% de chance: CorpoSeco (médio)
             return new CorpoSeco(x, y, entityManager);
         }
     }
 
+    // Inimigos que ficam para trás reaparecem do outro lado, ainda fora da tela
     private void wrapAroundCamera(Enemy enemy) {
-        float camX = camera.position.x;
-        float camY = camera.position.y;
-        float width = camera.viewportWidth;
-        float height = camera.viewportHeight;
-
-        float margin = 16.0f;
-
-        float leftBound = camX - (width / 2f) - margin;
-        float rightBound = camX + (width / 2f) + margin;
-        float bottomBound = camY - (height / 2f) - margin;
-        float topBound = camY + (height / 2f) + margin;
+        float leftBound = camera.position.x - camera.viewportWidth / 2f - OFFSCREEN_MARGIN;
+        float rightBound = camera.position.x + camera.viewportWidth / 2f + OFFSCREEN_MARGIN;
+        float bottomBound = camera.position.y - camera.viewportHeight / 2f - OFFSCREEN_MARGIN;
+        float topBound = camera.position.y + camera.viewportHeight / 2f + OFFSCREEN_MARGIN;
 
         if (enemy.getX() > rightBound) {
             enemy.setX(leftBound);

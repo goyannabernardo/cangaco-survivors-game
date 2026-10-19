@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.unicamp.model.entity.EntityManager;
 import com.unicamp.model.entity.projectile.WhipProjectile;
 import com.unicamp.view.EntityRenderer;
 
@@ -17,7 +18,6 @@ public class WhipRenderer implements EntityRenderer<WhipProjectile> {
     private static final float RENDER_HEIGHT = 128f;
 
     private Animation<TextureRegion> currentAnimation;
-    private float stateTime;
 
     public WhipRenderer() {
         this.idleSheet = new Texture(Gdx.files.internal("weapons/Slash_Merge.png"));
@@ -27,7 +27,7 @@ public class WhipRenderer implements EntityRenderer<WhipProjectile> {
 
     @Override
     public void render(SpriteBatch batch, WhipProjectile entity) {
-        stateTime += Gdx.graphics.getDeltaTime();
+        float stateTime = EntityManager.getGlobalTime();
         TextureRegion currentFrame = currentAnimation.getKeyFrame(stateTime, true);
         
         float scaleX = entity.isFlipped() ? -1f : 1f;

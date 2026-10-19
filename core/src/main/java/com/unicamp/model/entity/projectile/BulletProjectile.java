@@ -1,5 +1,8 @@
 package com.unicamp.model.entity.projectile;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.unicamp.exception.IllegalEntityStateException;
 import com.unicamp.model.entity.EntityManager;
 import com.unicamp.model.entity.enemy.Enemy;
@@ -16,14 +19,16 @@ public class BulletProjectile extends Projectile {
     private boolean initialized = false;
     private int piercingLeft;
 
+    private final Set<Enemy> alreadyHit = new HashSet<>();
+
     public BulletProjectile(float x, float y, float finalDamage, int maxPiercing) {
         super(x, y, 30f, 15f, finalDamage);
         this.piercingLeft = maxPiercing;
 
         onCollideWith(Enemy.class, enemy -> {
-            piercingLeft--;
-            if (piercingLeft <= 0) {
-                destroy();
+            if (alreadyHit.add(enemy)) {
+                piercingLeft--;
+                if (piercingLeft <= 0) destroy();
             }
         });
     }

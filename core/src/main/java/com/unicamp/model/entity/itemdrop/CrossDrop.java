@@ -6,7 +6,7 @@ import com.unicamp.model.entity.weapon.Cross;
 public class CrossDrop extends ItemDrop {
 
 	public CrossDrop(float x, float y) {
-		super(x, y, 10, 10);
+		super(x, y);
 		onCollideWith(Player.class, player -> {
 			player.addWeapon(new Cross());
 			destroy();

@@ -5,7 +5,7 @@ import com.unicamp.model.entity.EntityManager;
 
 public abstract class ItemDrop extends Entity {
 
-	public ItemDrop(float x, float y, float hitW, float hitH) {
+	public ItemDrop(float x, float y) {
 		super(x, y, 25, 25);
 	}
 

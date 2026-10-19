@@ -2,14 +2,20 @@ package com.unicamp.view.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.unicamp.model.entity.Player;
 import com.unicamp.model.entity.weapon.Whip;
+import com.unicamp.model.entity.weapon.Cross;
 import com.unicamp.model.valueobject.CreatureHealth;
 import com.unicamp.view.EnemySpawner;
 import com.unicamp.view.Scene;
@@ -18,6 +24,7 @@ import com.unicamp.view.renderer.BackgroundRenderer;
 public class MainScene extends Scene {
 
     private static final float HEALTH_BAR_WIDTH = 260f; // largura da barra na tela (px)
+    private static final String PAUSE_FONT_PATH = "fonts/xilosa.ttf";
 
     private final SpriteBatch batch;
     private final Player player;
@@ -30,28 +37,56 @@ public class MainScene extends Scene {
     private final Texture healthInsideTex;
     private final Texture healthOutlineTex;
 
+    private final BitmapFont pauseFont;
+    private final GlyphLayout pauseLayout;
+
     public MainScene(SpriteBatch batch, OrthographicCamera camera) {
         this.camera = camera;
         this.camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.backgroundRenderer = new BackgroundRenderer("background/Floor.png", 4, 3);
         
         this.player = new Player(0, 0);
-        player.addWeapon(new Whip());
+        player.addWeapon(new Cross());
 
         this.batch = batch;
         
-        this.enemySpawner = new EnemySpawner(entityManager, 0f, camera);
+        this.enemySpawner = new EnemySpawner(entityManager, camera);
         addEntity(player);
 
         this.uiViewport = new ScreenViewport();
         this.uiViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         this.healthInsideTex = new Texture("ui/life_fill.png");
         this.healthOutlineTex = new Texture("ui/life_bar.png");
+
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(PAUSE_FONT_PATH));
+        FreeTypeFontParameter fontParams = new FreeTypeFontParameter();
+        fontParams.size = 64;
+        
+        fontParams.color = Color.valueOf("#f7ead4");
+
+        fontParams.borderWidth = 3;
+        fontParams.borderColor = Color.BLACK;
+
+        //tentativa de efeito de borda dupla
+        fontParams.shadowOffsetX = 0;
+        fontParams.shadowOffsetY = 0;
+        fontParams.shadowColor = Color.valueOf("#f7ead4");
+
+        this.pauseFont = generator.generateFont(fontParams);
+        generator.dispose();
+        this.pauseLayout = new GlyphLayout(pauseFont, "PAUSED");
     }
 
     @Override
     protected void onUpdate(float deltaTime) {
-        input();
+        if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+            entityManager.togglePause();
+        }
+
+        // Pausado ignora o input para o personagem não trocar de pose
+        if (!entityManager.getIsPaused()) {
+            input(deltaTime);
+        }
 
         camera.position.set(player.getX(), player.getY(), 0);
         camera.update();
@@ -80,6 +115,12 @@ public class MainScene extends Scene {
         batch.begin();
         
         drawHealthBar(batch);
+
+        if (entityManager.getIsPaused()) {
+            pauseFont.draw(batch, pauseLayout,
+                (Gdx.graphics.getWidth() - pauseLayout.width) / 2f,
+                (Gdx.graphics.getHeight() + pauseLayout.height) / 2f);
+        }
         
         batch.end();
 
@@ -121,8 +162,10 @@ public class MainScene extends Scene {
         batch.draw(healthOutlineTex, margin, margin, barWidth, barHeight);
     }
 
-    public void input() {
-        final float WALK_SPEED = 5.5f;
+    //antes os frames influenciavam a velocidade
+    private static final float WALK_SPEED = 300f;
+
+    public void input(float deltaTime) {
         float speedX = Boolean.compare(Gdx.input.isKeyPressed(Keys.D), false) -  Boolean.compare(Gdx.input.isKeyPressed(Keys.A), false);
         float speedY = Boolean.compare(Gdx.input.isKeyPressed(Keys.W), false) -  Boolean.compare(Gdx.input.isKeyPressed(Keys.S), false);
         float magnitude = (float) Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
@@ -132,8 +175,8 @@ public class MainScene extends Scene {
             speedY /= magnitude;
         }
 
-        player.setxSpeed(speedX * WALK_SPEED);
-        player.setySpeed(speedY * WALK_SPEED);
+        player.setxSpeed(speedX * WALK_SPEED * deltaTime);
+        player.setySpeed(speedY * WALK_SPEED * deltaTime);
     }
 
     @Override
@@ -147,5 +190,6 @@ public class MainScene extends Scene {
         backgroundRenderer.dispose();
         healthInsideTex.dispose();
         healthOutlineTex.dispose();
+        pauseFont.dispose();
     }
 }

@@ -6,7 +6,7 @@ import com.unicamp.model.entity.weapon.Pistol;
 public class PistolDrop extends ItemDrop {
 
 	public PistolDrop(float x, float y) {
-		super(x, y, 10, 10);
+		super(x, y);
 		onCollideWith(Player.class, player -> {
 			player.addWeapon(new Pistol());
 			destroy();
