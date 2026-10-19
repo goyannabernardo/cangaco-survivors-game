@@ -17,6 +17,8 @@ import com.unicamp.view.renderer.BackgroundRenderer;
 
 public class MainScene extends Scene {
 
+    private static final float HEALTH_BAR_WIDTH = 260f; // largura da barra na tela (px)
+
     private final SpriteBatch batch;
     private final Player player;
     private final OrthographicCamera camera;
@@ -99,23 +101,24 @@ public class MainScene extends Scene {
         float healthPercentage = currentHealth / maxHealth;
         healthPercentage = Math.max(0, Math.min(1, healthPercentage));
 
-        float xPos = 20f;
-        float yPos = -healthOutlineTex.getHeight()/3; 
+        float margin = 20f;
+        float barWidth = HEALTH_BAR_WIDTH;
+        float barHeight = barWidth * healthOutlineTex.getHeight() / healthOutlineTex.getWidth();
 
         int cropWidth = (int) (healthInsideTex.getWidth() * healthPercentage);
 
         if (cropWidth > 0) {
             batch.draw(
-                healthInsideTex, 
-                xPos, yPos, 
-                cropWidth, healthInsideTex.getHeight(), 
-                0, 0, 
-                cropWidth, healthInsideTex.getHeight(), 
-                false, false 
+                healthInsideTex,
+                margin, margin,
+                barWidth * healthPercentage, barHeight,
+                0, 0,
+                cropWidth, healthInsideTex.getHeight(),
+                false, false
             );
         }
 
-        batch.draw(healthOutlineTex, xPos, yPos);
+        batch.draw(healthOutlineTex, margin, margin, barWidth, barHeight);
     }
 
     public void input() {
@@ -134,7 +137,14 @@ public class MainScene extends Scene {
     }
 
     @Override
+    public boolean isGameOver() {
+        return !player.isActive();
+    }
+
+    @Override
     public void dispose() {
+        super.dispose();
+        backgroundRenderer.dispose();
         healthInsideTex.dispose();
         healthOutlineTex.dispose();
     }

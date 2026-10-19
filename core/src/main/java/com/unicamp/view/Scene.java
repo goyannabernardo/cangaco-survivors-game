@@ -33,6 +33,10 @@ public abstract class Scene {
         entityManager.render(batch);
 	}
 
+    public boolean isGameOver() { return false; }
     public void resize(int width, int height) {}
-    public void dispose() {}
+
+    public void dispose() {
+        entityManager.dispose();
+    }
 }
