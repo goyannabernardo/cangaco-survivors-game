@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.unicamp.model.entity.Player;
-import com.unicamp.model.entity.weapon.Whip;
 import com.unicamp.model.entity.weapon.Cross;
+import com.unicamp.model.entity.weapon.Whip;
 import com.unicamp.model.valueobject.CreatureHealth;
 import com.unicamp.view.EnemySpawner;
 import com.unicamp.view.Scene;
@@ -46,7 +46,7 @@ public class MainScene extends Scene {
         this.backgroundRenderer = new BackgroundRenderer("background/Floor.png", 4, 3);
         
         this.player = new Player(0, 0);
-        player.addWeapon(new Cross());
+        player.addWeapon(new Whip());
 
         this.batch = batch;
         
