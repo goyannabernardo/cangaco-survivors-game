@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.unicamp.model.entity.EntityManager;
 import com.unicamp.model.entity.projectile.WhipProjectile;
 import com.unicamp.view.EntityRenderer;
-import com.unicamp.model.entity.EntityManager;
 
 public class WhipRenderer implements EntityRenderer<WhipProjectile> {
 
@@ -19,7 +18,6 @@ public class WhipRenderer implements EntityRenderer<WhipProjectile> {
     private static final float RENDER_HEIGHT = 128f;
 
     private Animation<TextureRegion> currentAnimation;
-    private float stateTime;
 
     public WhipRenderer() {
         this.idleSheet = new Texture(Gdx.files.internal("weapons/Slash_Merge.png"));

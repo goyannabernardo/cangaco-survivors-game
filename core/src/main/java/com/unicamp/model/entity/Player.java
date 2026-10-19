@@ -12,8 +12,7 @@ public class Player extends Creature {
 
     private final CombatStats stats;
 
-    private int maxWeapons = 3;
-    private Set<Weapon> weapons = new HashSet<>(maxWeapons);
+    private final Set<Weapon> weapons = new HashSet<>();
 
     public Player(int x, int y) {
         super(x, y, 30, 80, 100);

@@ -6,7 +6,7 @@ import com.unicamp.model.entity.weapon.Whip;
 public class WhipDrop extends ItemDrop {
 
 	public WhipDrop(float x, float y) {
-		super(x, y, 10, 10);
+		super(x, y);
 		onCollideWith(Player.class, player -> {
 			player.addWeapon(new Whip());
 			destroy();
