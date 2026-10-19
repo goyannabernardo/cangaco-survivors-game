@@ -9,19 +9,26 @@ import com.unicamp.view.scenes.MainScene;
 
 public class GameplayScreen implements Screen {
 
+    private static final float GAME_OVER_DELAY = 1.0f;
+
     private final SpriteBatch batch;
     private final OrthographicCamera camera;
+    private final Runnable onGameOver;
+
+    private float gameOverTimer = 0f;
+    private boolean gameOverTriggered = false;
 
     private Scene scene;
 
     float spriteSize = 64f;
 
-    public GameplayScreen(SpriteBatch batch) {
-        if (batch == null) {
+    public GameplayScreen(SpriteBatch batch, Runnable onGameOver) {
+        if (batch == null || onGameOver == null) {
             throw new IllegalArgumentException("Dependências vitais da tela não podem ser nulas.");
         }
 
         this.batch = batch;
+        this.onGameOver = onGameOver;
 
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, 1024f, 768f);
@@ -31,7 +38,6 @@ public class GameplayScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        handleInput(delta);
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -44,14 +50,15 @@ public class GameplayScreen implements Screen {
 		scene.render(batch, delta);
         
         batch.end();
-    }
 
-    /**
-     * Isola a lógica de captura de teclas.
-     * O domínio recebe apenas a "intenção" de movimento, sem saber que foi a tecla W, A, S ou D.
-     */
-    private void handleInput(float delta) {
-
+        // Quando morre espera um momento e ai coloca a tela de morte
+        if (scene.isGameOver() && !gameOverTriggered) {
+            gameOverTimer += delta;
+            if (gameOverTimer >= GAME_OVER_DELAY) {
+                gameOverTriggered = true;
+                onGameOver.run();
+            }
+        }
     }
 
     @Override

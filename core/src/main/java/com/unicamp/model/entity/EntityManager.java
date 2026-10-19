@@ -18,7 +18,7 @@ public class EntityManager {
 	private final RendererFactory rendererFactory;
 	
 	private final boolean isDebug = false;
-	private final DebugRenderer debugRenderer = new DebugRenderer();
+	private final DebugRenderer debugRenderer = isDebug ? new DebugRenderer() : null;
 
     private static float globalTime = 0f;
     private boolean isPaused = false;
@@ -27,6 +27,7 @@ public class EntityManager {
         this.entitiesToSpawn = new ArrayList<>();
         this.entities = new ArrayList<>();
         this.rendererFactory = RendererFactory.getInstance();
+        globalTime = 0f; // reinicia o relógio do jogo ao começar uma nova partida
     }
 
     public void render(SpriteBatch batch) {
@@ -139,6 +140,12 @@ public class EntityManager {
 
     public void clear() {
         entitiesToSpawn.clear();
+    }
+
+    public void dispose() {
+        if (debugRenderer != null) {
+            debugRenderer.dispose();
+        }
     }
 
     public boolean getIsPaused(){

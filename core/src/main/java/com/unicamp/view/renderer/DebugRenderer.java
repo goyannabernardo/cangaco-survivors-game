@@ -11,7 +11,7 @@ public class DebugRenderer implements EntityRenderer<Entity> {
 	private final Texture whitePixel;
 
 	public DebugRenderer() {
-		this.whitePixel = new Texture("white_pixel.png");
+		this.whitePixel = new Texture("ui/white_pixel.png");
 	}
 
 	@Override
