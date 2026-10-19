@@ -84,7 +84,7 @@ public class MainScene extends Scene {
 
         // Pausado ignora o input para o personagem não trocar de pose
         if (!entityManager.getIsPaused()) {
-            input();
+            input(deltaTime);
         }
 
         camera.position.set(player.getX(), player.getY(), 0);
@@ -161,8 +161,10 @@ public class MainScene extends Scene {
         batch.draw(healthOutlineTex, margin, margin, barWidth, barHeight);
     }
 
-    public void input() {
-        final float WALK_SPEED = 5.5f;
+    //antes os frames influenciavam a velocidade
+    private static final float WALK_SPEED = 300f;
+
+    public void input(float deltaTime) {
         float speedX = Boolean.compare(Gdx.input.isKeyPressed(Keys.D), false) -  Boolean.compare(Gdx.input.isKeyPressed(Keys.A), false);
         float speedY = Boolean.compare(Gdx.input.isKeyPressed(Keys.W), false) -  Boolean.compare(Gdx.input.isKeyPressed(Keys.S), false);
         float magnitude = (float) Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
@@ -172,8 +174,8 @@ public class MainScene extends Scene {
             speedY /= magnitude;
         }
 
-        player.setxSpeed(speedX * WALK_SPEED);
-        player.setySpeed(speedY * WALK_SPEED);
+        player.setxSpeed(speedX * WALK_SPEED * deltaTime);
+        player.setySpeed(speedY * WALK_SPEED * deltaTime);
     }
 
     @Override
