@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.unicamp.model.entity.EntityManager;
 import com.unicamp.model.entity.projectile.WhipProjectile;
 import com.unicamp.view.EntityRenderer;
+import com.unicamp.model.entity.EntityManager;
 
 public class WhipRenderer implements EntityRenderer<WhipProjectile> {
 
@@ -27,7 +29,7 @@ public class WhipRenderer implements EntityRenderer<WhipProjectile> {
 
     @Override
     public void render(SpriteBatch batch, WhipProjectile entity) {
-        stateTime += Gdx.graphics.getDeltaTime();
+        float stateTime = EntityManager.getGlobalTime();
         TextureRegion currentFrame = currentAnimation.getKeyFrame(stateTime, true);
         
         float scaleX = entity.isFlipped() ? -1f : 1f;

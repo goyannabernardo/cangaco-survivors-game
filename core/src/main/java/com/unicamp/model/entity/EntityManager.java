@@ -148,8 +148,12 @@ public class EntityManager {
         }
     }
 
-    public boolean getIsPaused(){
+    public boolean getIsPaused() {
         return isPaused;
+    }
+
+    public void togglePause() {
+        isPaused = !isPaused;
     }
 
     public static float getGlobalTime() {
