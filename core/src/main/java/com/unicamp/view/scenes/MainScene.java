@@ -40,7 +40,7 @@ public class MainScene extends Scene {
 
         this.batch = batch;
         
-        this.enemySpawner = new EnemySpawner(entityManager, 0f, camera);
+        this.enemySpawner = new EnemySpawner(entityManager, camera);
         addEntity(player);
 
         this.uiViewport = new ScreenViewport();
